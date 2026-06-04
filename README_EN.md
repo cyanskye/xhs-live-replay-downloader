@@ -110,6 +110,14 @@ After installing the command, copy that folder into any AI tool that supports `S
 Download this Xiaohongshu live replay: <url>
 ```
 
+## Community
+
+Scan the QR code to join the WeChat group for AI workflows and practical tools.
+
+> The QR code is valid until June 11. If it expires, use the contact info on my GitHub profile.
+
+<img src="assets/wechat-group.jpg" alt="WeChat group QR code" width="260">
+
 ## Update
 
 Run the installer again:

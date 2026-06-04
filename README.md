@@ -110,6 +110,14 @@ skills/xhs-live-replay-downloader
 下载这个小红书直播回放：<链接>
 ```
 
+## 交流与反馈
+
+扫码加入「神奇桑桑・Ai 协同研究站」，交流 AI 协同工作流和实用工具。
+
+> 二维码 7 天内有效，6 月 11 日前可用。如失效，请通过 GitHub profile 里的联系方式联系我。
+
+<img src="assets/wechat-group.jpg" alt="神奇桑桑・Ai 协同研究站微信群二维码" width="260">
+
 ## 更新
 
 再次运行安装命令即可：
