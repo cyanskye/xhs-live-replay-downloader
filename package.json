@@ -17,9 +17,10 @@
   "files": [
     "bin/",
     "codex-skill/",
-    "scripts/",
-    "docs/images/",
+    "assets/",
+    "install.sh",
     "README.md",
+    "README_EN.md",
     "LICENSE"
   ],
   "scripts": {

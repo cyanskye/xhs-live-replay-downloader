@@ -31,7 +31,7 @@ xhs-live-replay --json '<xiaohongshu live replay url>'
 On macOS, use the repository installer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader/main/scripts/install-macos.sh | bash
+curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader/main/install.sh | bash
 ```
 
 Or run without global install:
