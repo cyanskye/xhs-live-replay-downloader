@@ -1,239 +1,173 @@
-# xhs-live-replay-downloader
+# 小红书直播回放下载
 
-小红书直播回放 `.m3u8` 提取与下载工具。
+一个小工具：给它小红书直播回放链接，它帮你下载视频。
 
-这是一个 **CLI 核心 + Codex Skill 使用说明** 的项目：
+> 目前只在 macOS 测试过。
 
-- 普通用户可以直接用命令行下载。
-- Codex 用户可以把 `codex-skill/xhs-live-replay-downloader` 当作 Skill 使用，让 Codex 自动执行 dry-run、下载和验证。
+![使用演示](docs/images/demo-dry-run.png)
 
-> 作者目前只在 macOS 环境测试过。Linux/Windows 可能可用，但没有系统验证。
+## 安装
 
-## 它怎么工作
-
-对于公开可访问的小红书直播回放分享链接，本工具会：
-
-1. 从 URL 里解析 `share_source_id` 和 `host_id`。
-2. 请求小红书直播回放详情接口：
-
-```text
-https://www.xiaohongshu.com/api/sns/v1/live/dynamic/clip_detail_web?clip_id=<share_source_id>&host_id=<host_id>
-```
-
-3. 从接口响应里提取真实的 `.m3u8` 地址。
-4. 可选：调用 `yt-dlp` 下载并用 `ffprobe` 验证视频。
-
-不会用你的浏览器账号、cookies 或小红书登录态。
-
-## 支持的链接
-
-已验证的链接形态：
-
-```text
-https://www.xiaohongshu.com/fe/live-h5/page/live_replay/<replay_id>?share_source_id=<clip_id>&host_id=<host_id>...
-https://www.xiaohongshu.com/hina/livereplay/<replay_id>?share_source_id=<clip_id>&host_id=<host_id>...
-```
-
-`.m3u8` 地址不要自己拼。小红书会返回不同形态的 HLS 地址，必须从接口响应里提取。
-
-## 一键安装，macOS
-
-需要 Homebrew。脚本会安装或检查：
-
-- Node.js
-- `yt-dlp`
-- `ffmpeg` / `ffprobe`
-- 本工具 CLI
+需要先安装 Homebrew。
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader/main/scripts/install-macos.sh | bash
 ```
 
-安装后：
+这个脚本会帮你准备下载需要的工具。
+
+## 使用
+
+先检查链接能不能下载：
 
 ```bash
 xhs-live-replay --dry-run '<小红书直播回放链接>'
+```
+
+开始下载：
+
+```bash
 xhs-live-replay '<小红书直播回放链接>'
 ```
 
-## 不安装直接用
+默认保存到：
 
-只提取 HLS 地址：
+```text
+~/Downloads
+```
+
+保存到指定文件夹：
+
+```bash
+xhs-live-replay --output-dir ./downloads '<小红书直播回放链接>'
+```
+
+## 不安装也可以用
 
 ```bash
 npx github:cyanskye/xhs-live-replay-downloader --dry-run '<小红书直播回放链接>'
 ```
 
-下载到 `~/Downloads`：
-
 ```bash
 npx github:cyanskye/xhs-live-replay-downloader '<小红书直播回放链接>'
 ```
 
-下载到指定目录：
+## 支持哪些链接
 
-```bash
-npx github:cyanskye/xhs-live-replay-downloader --output-dir ./downloads '<小红书直播回放链接>'
-```
-
-## Codex Skill
-
-Skill 文件在：
+目前测试过这两类：
 
 ```text
-codex-skill/xhs-live-replay-downloader/SKILL.md
+https://www.xiaohongshu.com/fe/live-h5/page/live_replay/...
+https://www.xiaohongshu.com/hina/livereplay/...
 ```
 
-推荐做法：
+如果链接已经失效、需要登录、需要验证码，工具会停止，不会尝试绕过。
 
-1. 先用上面的 macOS 一键脚本安装 CLI。
-2. 把 `codex-skill/xhs-live-replay-downloader` 复制到你的 Codex skills 目录。
-3. 之后可以直接让 Codex 处理：
+## 给 Codex 用
+
+这个仓库也带了一个 Codex Skill：
+
+```text
+codex-skill/xhs-live-replay-downloader
+```
+
+安装好 CLI 后，可以把这个文件夹放进你的 Codex skills 目录。之后直接对 Codex 说：
 
 ```text
 下载这个小红书直播回放：<链接>
 ```
 
-Skill 会优先 dry-run，确认拿到 `.m3u8` 后再下载。
+## 项目目录
 
-## 本地开发
-
-```bash
-git clone https://github.com/cyanskye/xhs-live-replay-downloader.git
-cd xhs-live-replay-downloader
-npm run check
-node bin/xhs-live-replay.js --dry-run '<小红书直播回放链接>'
+```text
+bin/            命令行工具
+scripts/        macOS 安装脚本
+codex-skill/    Codex Skill
+docs/images/    演示图片
 ```
 
-## 风控和边界
+这个结构是刻意分开的：普通用户用 `bin/` 里的命令，Codex 用户用 `codex-skill/`。
 
-默认策略是保守的：
+## 说明
 
-- 不登录小红书。
-- 不读取浏览器 cookies。
-- 不绕过验证码、登录、付费墙或访问限制。
-- 默认一次处理一个链接。
-- direct API 失败时才尝试浏览器兜底。
-
-如果回放不是公开可访问，本工具应该失败，而不是尝试绕过限制。
+- 不需要小红书账号。
+- 不读取浏览器 cookie。
+- 不批量抓取。
+- 一次处理一个回放链接。
+- 只下载你有权保存的内容。
 
 ---
 
-# xhs-live-replay-downloader
+# Xiaohongshu Live Replay Downloader
 
-Extract and download Xiaohongshu live replay `.m3u8` streams.
+A small tool for downloading Xiaohongshu live replay videos.
 
-This repository provides both a **CLI implementation** and a **Codex Skill wrapper**:
+> Tested on macOS only.
 
-- Regular users can run the command line tool directly.
-- Codex users can install the Skill under `codex-skill/xhs-live-replay-downloader` and let Codex run dry-runs, downloads, and verification.
+![Demo](docs/images/demo-dry-run.png)
 
-> Tested by the author on macOS only. Linux and Windows may work, but are not systematically verified.
+## Install
 
-## How It Works
-
-For public Xiaohongshu live replay share links, the tool:
-
-1. Parses `share_source_id` and `host_id` from the URL.
-2. Calls Xiaohongshu's live replay detail endpoint:
-
-```text
-https://www.xiaohongshu.com/api/sns/v1/live/dynamic/clip_detail_web?clip_id=<share_source_id>&host_id=<host_id>
-```
-
-3. Extracts the real `.m3u8` URL from the response.
-4. Optionally downloads it with `yt-dlp` and verifies the MP4 with `ffprobe`.
-
-It does not use your browser account, cookies, or Xiaohongshu login session.
-
-## Supported Links
-
-Known supported forms:
-
-```text
-https://www.xiaohongshu.com/fe/live-h5/page/live_replay/<replay_id>?share_source_id=<clip_id>&host_id=<host_id>...
-https://www.xiaohongshu.com/hina/livereplay/<replay_id>?share_source_id=<clip_id>&host_id=<host_id>...
-```
-
-Do not construct the `.m3u8` URL manually. Xiaohongshu returns multiple HLS URL shapes, so the HLS URL must be extracted from the API response.
-
-## One-Line Install, macOS
-
-Requires Homebrew. The installer checks or installs:
-
-- Node.js
-- `yt-dlp`
-- `ffmpeg` / `ffprobe`
-- this CLI
+Homebrew is required.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader/main/scripts/install-macos.sh | bash
 ```
 
-Then run:
+## Use
+
+Check a link first:
 
 ```bash
 xhs-live-replay --dry-run '<xiaohongshu live replay url>'
+```
+
+Download:
+
+```bash
 xhs-live-replay '<xiaohongshu live replay url>'
 ```
 
-## Run Without Installing
+The video is saved to:
 
-Only extract the HLS URL:
+```text
+~/Downloads
+```
+
+Choose another folder:
+
+```bash
+xhs-live-replay --output-dir ./downloads '<xiaohongshu live replay url>'
+```
+
+## Run Without Installing
 
 ```bash
 npx github:cyanskye/xhs-live-replay-downloader --dry-run '<xiaohongshu live replay url>'
 ```
 
-Download to `~/Downloads`:
-
 ```bash
 npx github:cyanskye/xhs-live-replay-downloader '<xiaohongshu live replay url>'
 ```
 
-Download to a chosen directory:
-
-```bash
-npx github:cyanskye/xhs-live-replay-downloader --output-dir ./downloads '<xiaohongshu live replay url>'
-```
-
 ## Codex Skill
 
-The Skill lives at:
+The Skill is here:
 
 ```text
-codex-skill/xhs-live-replay-downloader/SKILL.md
+codex-skill/xhs-live-replay-downloader
 ```
 
-Recommended setup:
-
-1. Install the CLI with the macOS one-line installer above.
-2. Copy `codex-skill/xhs-live-replay-downloader` into your Codex skills directory.
-3. Ask Codex:
+After installing the CLI, copy that folder into your Codex skills directory and ask Codex:
 
 ```text
 Download this Xiaohongshu live replay: <url>
 ```
 
-The Skill should dry-run first, then download after confirming the `.m3u8` was found.
+## Notes
 
-## Local Development
-
-```bash
-git clone https://github.com/cyanskye/xhs-live-replay-downloader.git
-cd xhs-live-replay-downloader
-npm run check
-node bin/xhs-live-replay.js --dry-run '<xiaohongshu live replay url>'
-```
-
-## Safety Boundaries
-
-The default behavior is conservative:
-
-- No Xiaohongshu login.
-- No browser cookies.
-- No captcha, login, paywall, or access-control bypass.
-- One replay at a time.
-- Browser fallback is only used if direct API extraction fails.
-
-If a replay is not publicly accessible, the tool should fail rather than bypass access controls.
+- No Xiaohongshu account is needed.
+- Browser cookies are not used.
+- One link is handled at a time.
+- If a link requires login or captcha, the tool stops.
+- Only download content you are allowed to save.

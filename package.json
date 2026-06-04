@@ -3,9 +3,25 @@
   "version": "0.1.0",
   "description": "Extract and download Xiaohongshu live replay HLS streams.",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyanskye/xhs-live-replay-downloader.git"
+  },
+  "homepage": "https://github.com/cyanskye/xhs-live-replay-downloader#readme",
+  "bugs": {
+    "url": "https://github.com/cyanskye/xhs-live-replay-downloader/issues"
+  },
   "bin": {
     "xhs-live-replay": "./bin/xhs-live-replay.js"
   },
+  "files": [
+    "bin/",
+    "codex-skill/",
+    "scripts/",
+    "docs/images/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "check": "node --check bin/xhs-live-replay.js"
   },

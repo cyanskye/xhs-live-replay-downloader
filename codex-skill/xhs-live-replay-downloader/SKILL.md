@@ -15,13 +15,13 @@ Use the CLI from this repository as the deterministic implementation. Do not pas
 2. Run a dry run first:
 
 ```bash
-xhs-live-replay --dry-run '<xiaohongshu live replay url>'
+xhs-live-replay --dry-run --json '<xiaohongshu live replay url>'
 ```
 
 3. If it returns `status: "m3u8_found"`, download:
 
 ```bash
-xhs-live-replay '<xiaohongshu live replay url>'
+xhs-live-replay --json '<xiaohongshu live replay url>'
 ```
 
 4. Report the saved file path plus `ffprobe` verification from the CLI output.
@@ -37,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader
 Or run without global install:
 
 ```bash
-npx github:cyanskye/xhs-live-replay-downloader --dry-run '<url>'
+npx github:cyanskye/xhs-live-replay-downloader --dry-run --json '<url>'
 ```
 
 ## Safety Defaults

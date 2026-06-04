@@ -7,13 +7,14 @@ const { spawnSync } = require('child_process');
 
 function usage(exitCode = 2) {
   const script = path.basename(process.argv[1]);
-  console.error(`Usage: ${script} [--dry-run] [--output-dir DIR] [--timeout-ms N] <xiaohongshu-live-replay-url>`);
+  console.error(`Usage: ${script} [--dry-run] [--json] [--output-dir DIR] [--timeout-ms N] <xiaohongshu-live-replay-url>`);
   process.exit(exitCode);
 }
 
 function parseArgs(argv) {
   const opts = {
     dryRun: false,
+    json: false,
     outputDir: path.join(os.homedir(), 'Downloads'),
     timeoutMs: 30000,
   };
@@ -23,6 +24,8 @@ function parseArgs(argv) {
     const arg = argv[i];
     if (arg === '--dry-run') {
       opts.dryRun = true;
+    } else if (arg === '--json') {
+      opts.json = true;
     } else if (arg === '--output-dir') {
       opts.outputDir = argv[++i];
       if (!opts.outputDir) usage();
@@ -237,6 +240,35 @@ function verifyMp4(filePath) {
   return JSON.parse(result.stdout);
 }
 
+function humanSize(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value)) return '';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = value;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit += 1;
+  }
+  return `${size.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+function humanDuration(seconds) {
+  const value = Math.round(Number(seconds));
+  if (!Number.isFinite(value)) return '';
+  const h = Math.floor(value / 3600);
+  const m = Math.floor((value % 3600) / 60);
+  const s = value % 60;
+  if (h) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function videoResolution(probe) {
+  const stream = (probe.streams || []).find((item) => item.codec_type === 'video');
+  if (!stream || !stream.width || !stream.height) return '';
+  return `${stream.width}x${stream.height}`;
+}
+
 function validateReplayUrl(url) {
   const parsed = new URL(url);
   if (!['www.xiaohongshu.com', 'xiaohongshu.com'].includes(parsed.hostname)) {
@@ -256,30 +288,47 @@ function validateReplayUrl(url) {
     ensureCommand('ffprobe', 'Install ffmpeg first.');
   }
 
-  console.error('Extracting replay m3u8...');
+  if (!opts.json) console.error('正在检查链接...');
   const extraction = await extractM3u8BestEffort(opts.url, opts.timeoutMs);
   if (!extraction.m3u8Url) {
     console.error(JSON.stringify(extraction, null, 2));
     throw new Error('No m3u8 URL found. The replay may be expired, login-gated, or not publicly accessible.');
   }
 
-  console.log(JSON.stringify({
+  const foundPayload = {
     status: opts.dryRun ? 'm3u8_found' : 'm3u8_found_downloading',
     method: extraction.method,
     title: extraction.title,
     m3u8Url: extraction.m3u8Url,
     apiResponses: extraction.apiResponses,
-  }, null, 2));
+  };
+
+  if (opts.json) {
+    console.log(JSON.stringify(foundPayload, null, 2));
+  } else if (opts.dryRun) {
+    console.log('已找到可下载视频地址。');
+    console.log('如果要下载，请去掉 --dry-run 再运行一次。');
+  }
 
   if (opts.dryRun) return;
 
   const outputPath = downloadM3u8(extraction.m3u8Url, opts.outputDir, parseReplayUrl(opts.url).replayId);
   const probe = verifyMp4(outputPath);
-  console.log(JSON.stringify({
+  const downloadedPayload = {
     status: 'downloaded',
     outputPath,
     probe,
-  }, null, 2));
+  };
+
+  if (opts.json) {
+    console.log(JSON.stringify(downloadedPayload, null, 2));
+  } else {
+    console.log('下载完成。');
+    console.log(`文件：${outputPath}`);
+    console.log(`时长：${humanDuration(probe.format && probe.format.duration)}`);
+    console.log(`大小：${humanSize(probe.format && probe.format.size)}`);
+    console.log(`画面：${videoResolution(probe)}`);
+  }
 })().catch((error) => {
   console.error(`ERROR: ${error.message}`);
   process.exit(1);
