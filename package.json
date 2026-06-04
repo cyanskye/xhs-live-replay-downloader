@@ -1,0 +1,25 @@
+{
+  "name": "xhs-live-replay-downloader",
+  "version": "0.1.0",
+  "description": "Extract and download Xiaohongshu live replay HLS streams.",
+  "type": "commonjs",
+  "bin": {
+    "xhs-live-replay": "./bin/xhs-live-replay.js"
+  },
+  "scripts": {
+    "check": "node --check bin/xhs-live-replay.js"
+  },
+  "keywords": [
+    "xiaohongshu",
+    "xhs",
+    "live-replay",
+    "m3u8",
+    "hls",
+    "yt-dlp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
