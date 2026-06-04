@@ -23,7 +23,7 @@
 - 默认保存到 `~/Downloads`
 - 不需要小红书账号
 - 不读取浏览器 cookie
-- 支持作为 Codex Skill 使用
+- 支持作为 AI Agent Skill 使用
 
 ## 安装
 
@@ -96,15 +96,15 @@ https://www.xiaohongshu.com/hina/livereplay/...
 
 如果链接已经失效、需要登录、需要验证码，工具会停止。
 
-## Codex Skill
+## AI Agent Skill
 
-仓库里带了 Codex Skill：
+仓库里带了一个通用 Skill：
 
 ```text
-codex-skill/xhs-live-replay-downloader
+skills/xhs-live-replay-downloader
 ```
 
-安装好命令后，把这个文件夹放进你的 Codex skills 目录。之后可以直接对 Codex 说：
+安装好命令后，把这个文件夹放进支持 `SKILL.md` 的 AI 工具里。之后可以直接说：
 
 ```text
 下载这个小红书直播回放：<链接>
@@ -123,7 +123,7 @@ curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader
 ```text
 assets/         演示图片
 bin/            命令行工具
-codex-skill/    Codex Skill
+skills/         AI Agent Skill
 install.sh      macOS 安装脚本
 README_EN.md    英文说明
 ```

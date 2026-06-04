@@ -16,7 +16,7 @@
   },
   "files": [
     "bin/",
-    "codex-skill/",
+    "skills/",
     "assets/",
     "install.sh",
     "README.md",

@@ -23,7 +23,7 @@ This tool does one thing: save a Xiaohongshu live replay video to your computer.
 - Save to `~/Downloads` by default
 - No Xiaohongshu account required
 - No browser cookies used
-- Can be used as a Codex Skill
+- Can be used as an AI Agent Skill
 
 ## Install
 
@@ -96,15 +96,15 @@ https://www.xiaohongshu.com/hina/livereplay/...
 
 If a link is expired, login-gated, or captcha-gated, the tool stops.
 
-## Codex Skill
+## AI Agent Skill
 
-The repository includes a Codex Skill:
+The repository includes a generic Skill:
 
 ```text
-codex-skill/xhs-live-replay-downloader
+skills/xhs-live-replay-downloader
 ```
 
-After installing the command, copy that folder into your Codex skills directory. Then ask Codex:
+After installing the command, copy that folder into any AI tool that supports `SKILL.md`. Then ask:
 
 ```text
 Download this Xiaohongshu live replay: <url>
@@ -123,7 +123,7 @@ curl -fsSL https://raw.githubusercontent.com/cyanskye/xhs-live-replay-downloader
 ```text
 assets/         demo image
 bin/            command line tool
-codex-skill/    Codex Skill
+skills/         AI Agent Skill
 install.sh      macOS installer
 README.md       Chinese docs
 ```
